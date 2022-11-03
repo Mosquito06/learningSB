@@ -15,9 +15,9 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.Map;
 
-//@Configuration
+@Configuration
 @RequiredArgsConstructor
-public class JobExcutionConfiguration
+public class StepConfiguraion
 {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
@@ -25,7 +25,7 @@ public class JobExcutionConfiguration
     @Bean
     public Job job()
     {
-        return jobBuilderFactory.get("jobExcution")
+        return jobBuilderFactory.get("step")
                 .start(step1())
                 .next(step2())
                 .build();
@@ -40,15 +40,7 @@ public class JobExcutionConfiguration
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
                     {
-                        JobParameters jobParameters = stepContribution.getStepExecution().getJobExecution().getJobParameters();
-                        jobParameters.getString("name");
-                        jobParameters.getLong("seq");
-                        jobParameters.getDate("date");
-                        jobParameters.getDouble("age");
-
-                        Map<String, Object> jobParameters1 = chunkContext.getStepContext().getJobParameters();;
-
-                        System.out.println("jobParameter step1 was execute");
+                        System.out.println("step1 was execute");
                         return RepeatStatus.FINISHED;
                     }
                 })
@@ -64,7 +56,7 @@ public class JobExcutionConfiguration
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
                     {
-                        System.out.println("jobParameter step2 was execute");
+                        System.out.println("step2 was execute");
                         //throw new RuntimeException("step2 has fail");
 
                         return RepeatStatus.FINISHED;
