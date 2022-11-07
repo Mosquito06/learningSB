@@ -1,8 +1,6 @@
 package io.springbatch.springbatch;
 
 import lombok.RequiredArgsConstructor;
-
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -17,8 +15,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @RequiredArgsConstructor
-//@Configuration
-public class FlowJobConfiguration2
+// @Configuration
+public class FlowJobConfiguration3
 {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
@@ -26,40 +24,16 @@ public class FlowJobConfiguration2
     @Bean
     public Job batchJob()
     {
-        return jobBuilderFactory
-                .get("batchFlow")
-                .start( flowA() )
-                .next( Step3() )
-                .next( flowB() )
-                .next( Step6() )
-                .end()
-                .build();
+        return jobBuilderFactory.get("transitionJob")
+                .start( Step1() )
+                    .on("FAILED").to( Step2())
+                    .on("*").stop()
+                .from( Step1() )
+                    .on("*").to( Step3() )
+                    .next( Step4() )
+                    .on("FAILED").end()
+                .end().build();
     }
-
-    @Bean
-    public Flow flowA()
-    {
-        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
-
-        flowBuilder.start( Step1() )
-                .next( Step2() )
-                .end();
-
-        return flowBuilder.build();
-
-    };
-
-    @Bean
-    public Flow flowB()
-    {
-        FlowBuilder<Flow> flowBuilder = new FlowBuilder<>("flowA");
-
-        flowBuilder.start( Step4() )
-                .next( Step5() )
-                .end();
-
-        return flowBuilder.build();
-    };
 
     @Bean
     public Step Step1()
@@ -119,38 +93,6 @@ public class FlowJobConfiguration2
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
                     {
                         System.out.println(" >> step4 was executed ");
-                        return RepeatStatus.FINISHED;
-                    }
-                })
-                .build();
-    }
-
-    public Step Step5()
-    {
-        return stepBuilderFactory
-                .get("Step5")
-                .tasklet(new Tasklet()
-                {
-                    @Override
-                    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
-                    {
-                        System.out.println(" >> step5 was executed ");
-                        return RepeatStatus.FINISHED;
-                    }
-                })
-                .build();
-    }
-
-    public Step Step6()
-    {
-        return stepBuilderFactory
-                .get("Step6")
-                .tasklet(new Tasklet()
-                {
-                    @Override
-                    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
-                    {
-                        System.out.println(" >> step was executed ");
                         return RepeatStatus.FINISHED;
                     }
                 })
