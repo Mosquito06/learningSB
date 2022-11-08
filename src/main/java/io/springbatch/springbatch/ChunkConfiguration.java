@@ -1,22 +1,20 @@
 package io.springbatch.springbatch;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.job.flow.JobExecutionDecider;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration
 @RequiredArgsConstructor
-public class JobExcutionDeciderConfiguration
+@Configuration
+public class ChunkConfiguration
 {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
@@ -24,23 +22,15 @@ public class JobExcutionDeciderConfiguration
     @Bean
     public Job batchJob()
     {
-        return jobBuilderFactory.get("deciderJob")
-                .start( Step() )
-                .next( decider() )
-                .from( decider() ).on("ODD").to( OddStep() )
-                .from( decider() ).on("EVEN").to( EvenStep())
-                .end()
+        return jobBuilderFactory
+                .get("chunkJob")
+                .start(Step1())
+                .next( Step2() )
                 .build();
     }
 
     @Bean
-    public JobExecutionDecider decider()
-    {
-        return new CustomDecider();
-    }
-
-    @Bean
-    public Step Step()
+    public Step Step1()
     {
         return stepBuilderFactory
                 .get("Step1")
@@ -49,39 +39,22 @@ public class JobExcutionDeciderConfiguration
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
                     {
-                        System.out.println("this is the start tasklet");
-
+                        System.out.println(" step1 has executed ");
                         return RepeatStatus.FINISHED;
                     }
                 })
                 .build();
     }
-    public Step EvenStep()
+    public Step Step2()
     {
         return stepBuilderFactory
-                .get("EvenStep")
+                .get("Step2")
                 .tasklet(new Tasklet()
                 {
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
                     {
-                        System.out.println(" >> EvenStep was executed ");
-                        return RepeatStatus.FINISHED;
-                    }
-                })
-                .build();
-    }
-
-    public Step OddStep()
-    {
-        return stepBuilderFactory
-                .get("OddStep")
-                .tasklet(new Tasklet()
-                {
-                    @Override
-                    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception
-                    {
-                        System.out.println(" >> OddStep was executed ");
+                        System.out.println(" >> step2 was executed ");
                         return RepeatStatus.FINISHED;
                     }
                 })
