@@ -32,11 +32,11 @@ spring:
     username: student
     password: 1111
   batch:
-#    job:
-#      names: ${job.name:NONE}
-#      enabled: false
-    jdbc:
-      initialize-schema: always
+    job:
+      names: ${job.name:NONE}
+      enabled: false
+#    jdbc:
+#      initialize-schema: always
     # job 자동실행 여부 설정
 #    job:
 #      enabled: false
@@ -44,7 +44,7 @@ spring:
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     #database-platform: org.hibernate.dialect.MariaDB103Dialect
     show-sql: true
     properties:
